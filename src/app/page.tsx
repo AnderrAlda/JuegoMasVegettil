@@ -1,6 +1,7 @@
 
 import { connectDB } from "@/libs/mongodb";
 import games from "@/models/games";
+import { SignedOut } from "@clerk/nextjs";
 
 
 
@@ -15,10 +16,14 @@ async function loadUsers() {
 export default async function Home() {
 
   const users = await loadUsers();
-  console.log(users)
+
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+
+      <SignedOut>
+        <div>Porfavor inicia sesion </div>
+      </SignedOut>
 
 
       <pre>{JSON.stringify(users, null, 2)}</pre>
