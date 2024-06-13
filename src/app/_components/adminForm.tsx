@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -19,6 +19,19 @@ import axios from 'axios'
 import { toast } from "sonner"
 import { getSignedUrlForS3Object } from '@/lib/s3'
 import { createUploadURL } from "@/lib/s3action"
+
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+interface Category {
+
+    title: string;
+}
 
 const formSchema = z.object({
     title: z.string().min(2).max(50),
@@ -81,11 +94,22 @@ const AdminForm = () => {
             toast.error("Error creando el juego");
         }
     }
+    const [categories, setCategories] = useState<Category[]>();
+    useEffect(() => {
+        axios.get('/api/categories')
+            .then(response => {
+                setCategories(response.data);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }, []);
 
     return (
         <div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
                     <FormField
                         control={form.control}
                         name="title"
@@ -118,17 +142,28 @@ const AdminForm = () => {
                             </FormItem>
                         )}
                     />
+
                     <FormField
                         control={form.control}
                         name="category"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Categoria</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="shadcn" {...field} />
-                                </FormControl>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Elige una categoria" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {categories?.map(category => (
+                                            <SelectItem key={category.title} value={category.title}>{category.title}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                                 <FormDescription>
                                     Elige la categoria del juego
+
                                 </FormDescription>
                                 <FormMessage />
                             </FormItem>
