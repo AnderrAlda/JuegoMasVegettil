@@ -6,4 +6,6 @@ export async function connectDB() {
     }
 
     await mongoose.connect(process.env.MONGODB_URL);
+
+ 
 }
