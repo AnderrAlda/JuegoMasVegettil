@@ -11,7 +11,8 @@ export function TopNav() {
 
     return (
         <nav className="flex w-full items-center justify-between border-b p-4 text-xl font-semibold">
-            <div>JuegoMasVegettil</div>
+            <Link href={"/"}><div>JuegoMasVegettil</div></Link>
+
 
             <div className="flex flex-row items-center gap-4">
                 <SignedOut>
@@ -19,7 +20,7 @@ export function TopNav() {
                 </SignedOut>
                 <SignedIn>
 
-                    {isAdmin && <Link href={"/admin/dashboard"}>Dashboard</Link>}
+                    {isAdmin && <Link href={"/admin"}>Dashboard</Link>}
 
 
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -27,9 +27,6 @@ const formSchema = z.object({
     category: z.string().min(2).max(50)
 })
 
-
-
-
 const AdminForm = () => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -42,6 +39,7 @@ const AdminForm = () => {
     })
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
         if (e.target.files && e.target.files[0]) {
@@ -62,11 +60,9 @@ const AdminForm = () => {
 
             console.log("url" + signedUrl)
 
-
             await fetch(signedUrl, {
                 method: "PUT",
                 body: selectedFile,
-
             })
 
             // Update the values with the URL of the uploaded image
@@ -76,11 +72,16 @@ const AdminForm = () => {
             toast.success("Juego creado correctamente");
             console.log(response.data);
             form.reset();
+            setSelectedFile(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
         } catch (error) {
             console.error(error);
             toast.error("Error creando el juego");
         }
     }
+
     return (
         <div>
             <Form {...form}>
@@ -108,7 +109,7 @@ const AdminForm = () => {
                             <FormItem>
                                 <FormLabel>Imagen</FormLabel>
                                 <FormControl>
-                                    <Input type="file" accept="image/*" onChange={handleFileChange} />
+                                    <Input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} />
                                 </FormControl>
                                 <FormDescription>
                                     Elige la imagen del juego
