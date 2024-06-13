@@ -51,3 +51,25 @@ export async function DELETE(request: NextRequest) {
 }
 
 
+
+
+export async function PATCH(request: NextRequest) {
+    try {
+        await connectDB();
+        const { id, ...updateData } = await request.json();
+
+        if (!id) {
+            return NextResponse.json({ error: 'Game ID is required' }, { status: 400 });
+        }
+
+        const updatedGame = await games.findByIdAndUpdate(id, updateData, { new: true });
+        if (!updatedGame) {
+            return NextResponse.json({ error: 'Game not found' }, { status: 404 });
+        }
+
+        return NextResponse.json(updatedGame);
+    } catch (error) {
+        console.error('Error updating game:', error);
+        return NextResponse.json({ error: 'Failed to update game' }, { status: 500 });
+    }
+}

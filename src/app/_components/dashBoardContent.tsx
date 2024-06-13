@@ -1,11 +1,18 @@
 "use client"
+
 import AdminForm from "@/app/_components/adminForm";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-
 import { Button } from "@/components/ui/button";
-
-
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import EditForm from "@/app/_components/editForm";
 
 interface Game {
     _id: string;
@@ -15,7 +22,6 @@ interface Game {
     category: string;
 }
 
-
 interface DashboardContentProps {
     initialGames: Game[];
 }
@@ -24,14 +30,14 @@ function getImageUrl(fileKey: string) {
     return `https://pub-0ac36a8b24eb4133942d20338a06e753.r2.dev/${fileKey}`;
 }
 
-
 const DashboardContent = ({ initialGames }: DashboardContentProps) => {
     const [games, setGames] = useState(initialGames);
+    const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+    const [isOpen, setIsOpen] = useState(false);
 
     function handleGameCreated(newGame: Game) {
         setGames([...games, newGame]);
     }
-
 
     async function handleDelete(id: string) {
         try {
@@ -42,13 +48,25 @@ const DashboardContent = ({ initialGames }: DashboardContentProps) => {
                 },
                 body: JSON.stringify({ id }),
             });
-            // Assuming deletion is successful, update the games state
             setGames(games.filter(game => game._id !== id));
         } catch (error) {
             console.error('Error deleting game:', error);
-            // Handle error as needed
         }
     }
+
+    const handleEdit = (game: Game) => {
+        setSelectedGame(game);
+        setIsOpen(true);
+    };
+
+    const handleClose = () => {
+        setIsOpen(false);
+    };
+
+    const handleUpdateGame = (updatedGame: Game) => {
+        setGames(games.map(game => game._id === updatedGame._id ? updatedGame : game));
+        setIsOpen(false);
+    };
 
     return (
         <div className="flex gap-40">
@@ -70,7 +88,24 @@ const DashboardContent = ({ initialGames }: DashboardContentProps) => {
                                 <p className="game-votes">Votes: {game.votes}</p>
                             </div>
                             <div className="flex flex-col gap-3 mt-4">
-                                <Button variant="outline">Editar</Button>
+                                <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" onClick={() => handleEdit(game)}>
+                                            Editar
+                                        </Button>
+                                    </DialogTrigger>
+                                    {selectedGame && (
+                                        <DialogContent className="sm:max-w-[425px]">
+                                            <DialogHeader>
+                                                <DialogTitle>Editar juego</DialogTitle>
+                                                <DialogDescription>
+                                                    Cambiar los datos del juego aqui. Clic guardar cuando termines.
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <EditForm game={selectedGame} onClose={handleClose} onUpdate={handleUpdateGame} />
+                                        </DialogContent>
+                                    )}
+                                </Dialog>
                                 <Button variant="outline" onClick={() => handleDelete(game._id)}>Eliminar</Button>
                             </div>
                         </div>
