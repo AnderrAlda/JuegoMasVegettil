@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
+import { useState, useRef, useEffect } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 import {
     Form,
     FormControl,
@@ -13,13 +13,12 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import axios from 'axios'
-import { toast } from "sonner"
-import { getSignedUrlForS3Object } from '@/lib/s3'
-import { createUploadURL } from "@/lib/s3action"
-
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import axios from "axios";
+import { toast } from "sonner";
+import { getSignedUrlForS3Object } from "@/lib/s3";
+import { createUploadURL } from "@/lib/s3action";
 
 import {
     Select,
@@ -27,9 +26,9 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-interface Category {
+} from "@/components/ui/select";
 
+interface Category {
     title: string;
 }
 
@@ -37,19 +36,31 @@ const formSchema = z.object({
     title: z.string().min(2).max(50),
     image: z.string().min(0).max(250),
     votes: z.number(),
-    category: z.string().min(2).max(50)
-})
+    category: z.string().min(2).max(50),
+});
 
-const AdminForm = () => {
+interface Game {
+    _id: string;
+    title: string;
+    image: string;
+    votes: number;
+    category: string;
+}
+
+interface AdminFormProps {
+    onGameCreated: (newGame: Game) => void;
+}
+
+const AdminForm = ({ onGameCreated }: AdminFormProps) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: "",
             image: "",
             votes: 0,
-            category: ""
+            category: "",
         },
-    })
+    });
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -66,22 +77,22 @@ const AdminForm = () => {
                 throw new Error("No file selected");
             }
 
-            console.log("file" + selectedFile.name + selectedFile.type)
+            console.log("file" + selectedFile.name + selectedFile.type);
 
             // Get a signed URL from Cloudflare
             const signedUrl = await createUploadURL(selectedFile.name, selectedFile.type);
 
-            console.log("url" + signedUrl)
+            console.log("url" + signedUrl);
 
             await fetch(signedUrl, {
                 method: "PUT",
                 body: selectedFile,
-            })
+            });
 
             // Update the values with the URL of the uploaded image
             values.image = selectedFile.name; // Remove query parameters
 
-            const response = await axios.post('/api/games', values); // Make a POST request to your API endpoint
+            const response = await axios.post("/api/games", values); // Make a POST request to your API endpoint
             toast.success("Juego creado correctamente");
             console.log(response.data);
             form.reset();
@@ -89,6 +100,7 @@ const AdminForm = () => {
             if (fileInputRef.current) {
                 fileInputRef.current.value = "";
             }
+            onGameCreated(response.data); // Call the callback function with the new game data
         } catch (error) {
             console.error(error);
             toast.error("Error creando el juego");
@@ -96,11 +108,12 @@ const AdminForm = () => {
     }
     const [categories, setCategories] = useState<Category[]>();
     useEffect(() => {
-        axios.get('/api/categories')
-            .then(response => {
+        axios
+            .get("/api/categories")
+            .then((response) => {
                 setCategories(response.data);
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error(error);
             });
     }, []);
@@ -109,7 +122,6 @@ const AdminForm = () => {
         <div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
                     <FormField
                         control={form.control}
                         name="title"
@@ -142,7 +154,6 @@ const AdminForm = () => {
                             </FormItem>
                         )}
                     />
-
                     <FormField
                         control={form.control}
                         name="category"
@@ -156,24 +167,23 @@ const AdminForm = () => {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {categories?.map(category => (
-                                            <SelectItem key={category.title} value={category.title}>{category.title}</SelectItem>
+                                        {categories?.map((category) => (
+                                            <SelectItem key={category.title} value={category.title}>
+                                                {category.title}
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <FormDescription>
-                                    Elige la categoria del juego
-
-                                </FormDescription>
+                                <FormDescription>Elige la categoria del juego</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit">Crear</Button>
                 </form>
             </Form>
         </div>
-    )
-}
+    );
+};
 
-export default AdminForm
+export default AdminForm;

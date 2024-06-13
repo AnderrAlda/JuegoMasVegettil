@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 
 
-async function loadUsers() {
+async function loadGames() {
   await connectDB()
   const recivedGames = await games.find()
   return recivedGames
@@ -22,7 +22,7 @@ function getImageUrl(fileKey: string) {
 
 export default async function Home() {
 
-  const recivedGames = await loadUsers();
+  const recivedGames = await loadGames();
 
   const isAdmin = checkRole("admin");
 
