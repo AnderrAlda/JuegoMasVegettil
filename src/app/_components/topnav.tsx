@@ -1,7 +1,14 @@
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import Link from "next/link";
+
+import { checkRole } from "@/utils/roles";
 
 
 export function TopNav() {
+
+    const isAdmin = checkRole("admin");
+
+
     return (
         <nav className="flex w-full items-center justify-between border-b p-4 text-xl font-semibold">
             <div>JuegoMasVegettil</div>
@@ -11,6 +18,10 @@ export function TopNav() {
                     <SignInButton />
                 </SignedOut>
                 <SignedIn>
+
+                    {isAdmin && <Link href={"/admin/dashboard"}>Dashboard</Link>}
+
+
 
                     <UserButton />
                 </SignedIn>

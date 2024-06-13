@@ -1,3 +1,4 @@
+import AdminForm from "@/app/_components/adminForm";
 import { checkRole } from "@/utils/roles";
 import { redirect } from "next/navigation";
 
@@ -8,10 +9,12 @@ export default function AdminDashboard() {
         redirect("/");
     }
 
+
+
+
     return (
-        <>
-            <h1>This is the admin dashboard</h1>
-            <p>This page is restricted to users with the 'admin' role.</p>
-        </>
+        <div className="flex min-h-screen flex-col items-center justify-between p-24">
+            <AdminForm />
+        </div>
     );
 }
