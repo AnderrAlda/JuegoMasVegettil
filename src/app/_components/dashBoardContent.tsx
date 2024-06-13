@@ -1,5 +1,5 @@
 "use client"
-
+import { toast } from "sonner";
 import AdminForm from "@/app/_components/adminForm";
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -49,8 +49,10 @@ const DashboardContent = ({ initialGames }: DashboardContentProps) => {
                 body: JSON.stringify({ id }),
             });
             setGames(games.filter(game => game._id !== id));
+            toast.success("Juego eliminado correctamente");
         } catch (error) {
             console.error('Error deleting game:', error);
+            toast.error("Error eliminando el juego");
         }
     }
 
