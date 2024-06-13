@@ -32,6 +32,24 @@ const DashboardContent = ({ initialGames }: DashboardContentProps) => {
         setGames([...games, newGame]);
     }
 
+
+    async function handleDelete(id: string) {
+        try {
+            await fetch('/api/games', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id }),
+            });
+            // Assuming deletion is successful, update the games state
+            setGames(games.filter(game => game._id !== id));
+        } catch (error) {
+            console.error('Error deleting game:', error);
+            // Handle error as needed
+        }
+    }
+
     return (
         <div className="flex gap-40">
             <AdminForm onGameCreated={handleGameCreated} />
@@ -53,7 +71,7 @@ const DashboardContent = ({ initialGames }: DashboardContentProps) => {
                             </div>
                             <div className="flex flex-col gap-3 mt-4">
                                 <Button variant="outline">Editar</Button>
-                                <Button variant="outline">Eliminar</Button>
+                                <Button variant="outline" onClick={() => handleDelete(game._id)}>Eliminar</Button>
                             </div>
                         </div>
                     </div>
