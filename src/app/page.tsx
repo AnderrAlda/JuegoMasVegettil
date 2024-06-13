@@ -30,6 +30,7 @@ export default async function Home() {
       </SignedOut>
 
       {isAdmin && <div>I am admin</div>}
+
       <pre>{JSON.stringify(users, null, 2)}</pre>
     </main>
   );

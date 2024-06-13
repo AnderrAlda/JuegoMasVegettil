@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const schema = new mongoose.Schema({
     title: String,
     image: String,
-    votes:Number
+    votes:Number,
+    category: String
 })
 
 
