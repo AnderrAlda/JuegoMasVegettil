@@ -66,6 +66,7 @@ const DashboardContent = ({ initialGames }: DashboardContentProps) => {
     const handleUpdateGame = (updatedGame: Game) => {
         setGames(games.map(game => game._id === updatedGame._id ? updatedGame : game));
         setIsOpen(false);
+        setSelectedGame(null); // Reset the selected game
     };
 
     return (
@@ -83,9 +84,9 @@ const DashboardContent = ({ initialGames }: DashboardContentProps) => {
                         />
                         <div>
                             <div className="game-details">
-                                <h2 className="game-title">{game.title}</h2>
-                                <p className="game-category">Category: {game.category}</p>
-                                <p className="game-votes">Votes: {game.votes}</p>
+                                <h2 className="game-title">Titulo: {game.title}</h2>
+                                <p className="game-category">Categoria: {game.category}</p>
+
                             </div>
                             <div className="flex flex-col gap-3 mt-4">
                                 <Dialog open={isOpen} onOpenChange={setIsOpen}>

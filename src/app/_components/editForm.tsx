@@ -26,6 +26,11 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
+
+interface Category {
+    title: string;
+}
+
 interface Game {
     _id: string;
     title: string;
@@ -100,13 +105,28 @@ const EditForm: React.FC<EditFormProps> = ({ game, onClose, onUpdate }) => {
             if (fileInputRef.current) {
                 fileInputRef.current.value = "";
             }
-            onUpdate({ ...game, ...values });
+
+            // Update the image URL in the local state
+            const updatedGame = { ...game, ...values, image: imageUrl };
+            onUpdate(updatedGame);
             onClose();
         } catch (error) {
             console.error(error);
             toast.error("Error actualizando el juego");
         }
     }
+    const [categories, setCategories] = useState<Category[]>();
+    useEffect(() => {
+        axios
+            .get("/api/categories")
+            .then((response) => {
+                setCategories(response.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }, []);
+
 
     return (
         <div>
@@ -157,7 +177,11 @@ const EditForm: React.FC<EditFormProps> = ({ game, onClose, onUpdate }) => {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {/* Render categories options */}
+                                        {categories?.map((category) => (
+                                            <SelectItem key={category.title} value={category.title}>
+                                                {category.title}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                                 <FormDescription>
