@@ -1,10 +1,9 @@
 "use client"
 
 import axios from "axios";
-
 import { useState, useEffect } from "react";
 import Image from "next/image";
-
+import { Button } from "@/components/ui/button";
 import {
     Select,
     SelectContent,
@@ -33,6 +32,7 @@ export default function SearchComp() {
     const [recivedGames, setRecivedGames] = useState<Game[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [selectedCategory, setSelectedCategory] = useState<string>(""); // Add this state
+    const [sortAlphabetically, setSortAlphabetically] = useState<boolean>(false); // Add sorting state
 
     useEffect(() => {
         async function loadGames() {
@@ -64,15 +64,24 @@ export default function SearchComp() {
             });
     }, []);
 
-    const filteredGames = recivedGames
+    let filteredGames = recivedGames
         .filter((game) => {
             if (selectedCategory) {
                 return game.category === selectedCategory;
             }
             return true;
         })
-        .filter((game) => game.title.toLowerCase().includes(searchTerm.toLowerCase()))
-        .sort((a, b) => b.votes - a.votes); // Sort by votes in descending order
+        .filter((game) => game.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    if (sortAlphabetically) {
+        filteredGames = filteredGames.sort((a, b) => a.title.localeCompare(b.title)); // Sort alphabetically by title
+    } else {
+        filteredGames = filteredGames.sort((a, b) => b.votes - a.votes); // Sort by votes in descending order by default
+    }
+
+    const handleSortToggle = () => {
+        setSortAlphabetically(!sortAlphabetically);
+    };
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -87,7 +96,7 @@ export default function SearchComp() {
 
                 <Select onValueChange={(value) => setSelectedCategory(value)}>
                     <SelectTrigger>
-                        <SelectValue placeholder="Elige una categoria" />
+                        <SelectValue placeholder="Elige una categoría" />
                     </SelectTrigger>
 
                     <SelectContent>
@@ -98,6 +107,10 @@ export default function SearchComp() {
                         ))}
                     </SelectContent>
                 </Select>
+
+                <Button variant="outline" onClick={handleSortToggle} className={sortAlphabetically ? "bg-black text-white" : "bg-white text-black"}>
+                    {sortAlphabetically ? "Orden por Votos" : "Orden Alfabetico"}
+                </Button>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
                 {filteredGames.map((game, index) => (
