@@ -11,7 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-
+import { useUser } from '@clerk/clerk-react';
 interface Game {
     _id: string;
     title: string;
@@ -29,6 +29,15 @@ function getImageUrl(fileKey: string) {
 }
 
 export default function SearchComp() {
+
+    const { user } = useUser();
+
+    useEffect(() => {
+        if (user) {
+            console.log('User ID:', user.id);
+        }
+    }, [user]);
+
     const [receivedGames, setReceivedGames] = useState<Game[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -65,11 +74,16 @@ export default function SearchComp() {
     }, []);
 
     const handleVoteIncrement = async (gameId: string) => {
+        if (!user) {
+            console.error('User is not logged in or not available');
+            return;
+        }
+
         try {
-            const response = await fetch(`/api/addGameVote`, {
-                method: "PATCH",
+            const response = await fetch('/api/addGameVote', {
+                method: 'PATCH',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ id: gameId }),
             });
@@ -83,13 +97,21 @@ export default function SearchComp() {
                     )
                 );
             } else {
-                console.error("Failed to increment vote:", response.status);
+                console.error('Failed to increment vote:', response.status);
             }
+
+            // Add vote to usersGamesVotes
+            await fetch('/api/usersGamesVotes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId: user.id, gameId }),
+            });
         } catch (error) {
-            console.error("Error incrementing vote:", error);
+            console.error('Error incrementing vote:', error);
         }
     };
-
     let filteredGames = receivedGames
         .filter((game) => {
             if (selectedCategory) {
