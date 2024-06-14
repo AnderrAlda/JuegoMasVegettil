@@ -1,7 +1,17 @@
 "use client"
 
+import axios from "axios";
+
 import { useState, useEffect } from "react";
 import Image from "next/image";
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 interface Game {
     _id: string;
@@ -11,6 +21,10 @@ interface Game {
     category: string;
 }
 
+interface Category {
+    title: string;
+}
+
 function getImageUrl(fileKey: string) {
     return `https://pub-0ac36a8b24eb4133942d20338a06e753.r2.dev/${fileKey}`;
 }
@@ -18,6 +32,7 @@ function getImageUrl(fileKey: string) {
 export default function SearchComp() {
     const [recivedGames, setRecivedGames] = useState<Game[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedCategory, setSelectedCategory] = useState<string>(""); // Add this state
 
     useEffect(() => {
         async function loadGames() {
@@ -37,13 +52,31 @@ export default function SearchComp() {
         loadGames();
     }, []);
 
+    const [categories, setCategories] = useState<Category[]>();
+    useEffect(() => {
+        axios
+            .get("/api/categories")
+            .then((response) => {
+                setCategories(response.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }, []);
+
     const filteredGames = recivedGames
+        .filter((game) => {
+            if (selectedCategory) {
+                return game.category === selectedCategory;
+            }
+            return true;
+        })
         .filter((game) => game.title.toLowerCase().includes(searchTerm.toLowerCase()))
         .sort((a, b) => b.votes - a.votes); // Sort by votes in descending order
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            <div className="mb-8">
+            <div className="mb-8 flex gap-4">
                 <input
                     type="text"
                     placeholder="Buscar por título..."
@@ -51,6 +84,20 @@ export default function SearchComp() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="p-2 border border-gray-300 rounded-md"
                 />
+
+                <Select onValueChange={(value) => setSelectedCategory(value)}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Elige una categoria" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                        {categories?.map((category) => (
+                            <SelectItem key={category.title} value={category.title}>
+                                {category.title}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
                 {filteredGames.map((game, index) => (
