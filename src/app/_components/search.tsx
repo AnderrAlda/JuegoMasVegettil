@@ -90,7 +90,11 @@ export default function SearchComp() {
             });
 
             if (!voteResponse.ok) {
-                toast.error("Juego ya votado");
+                if (voteResponse.status === 429) {
+                    toast.error("El usuario ha alcanzado el número máximo de votos");
+                } else {
+                    toast.error("Juego ya votado");
+                }
                 return;
             }
 
@@ -113,7 +117,7 @@ export default function SearchComp() {
                     );
                     toast.success("Juego votado correctamente");
                 } else {
-                    toast.error("Error votadon el juego");
+                    toast.error("Error votando el juego");
                 }
             } catch (error) {
                 toast.error("Error votando el juego");

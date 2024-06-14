@@ -19,6 +19,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'User has already voted for this game' }, { status: 400 });
         }
 
+        // Check if the user has voted five times
+        const userVotes = await usersGamesVotes.countDocuments({ userId });
+        if (userVotes >= 5) {
+            return NextResponse.json({ error: 'User has reached the maximum number of votes' }, { status: 429 });
+        }
+
         // If no existing vote, proceed to add the vote
         const filter = { userId, gameId };
         const update = { userId, gameId };
