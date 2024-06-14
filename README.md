@@ -9,7 +9,7 @@ Con el objetivo de conocer cuál es el videojuego de 2024 que más están espera
 
 ## Used technologies
 
-Has sido construido con las siguientes tecnologias:
+Ha sido construido con las siguientes tecnologias:
 
 -Typescript
 
