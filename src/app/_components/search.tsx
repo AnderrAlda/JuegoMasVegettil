@@ -149,7 +149,7 @@ export default function SearchComp() {
     };
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        <main className="flex min-h-screen flex-col items-center   p-24">
             <div className="mb-8 flex gap-4">
                 <input
                     type="text"
@@ -186,10 +186,19 @@ export default function SearchComp() {
                             : "bg-white text-black"
                     }
                 >
-                    {sortAlphabetically ? "Orden por Votos" : "Orden Alfabético"}
+
+
+                    {sortAlphabetically ? "Ordenar por Votos" : "Ordenar por orden alfabético"}
+                </Button>
+                <Button variant="outline" onClick={() => {
+                    setSearchTerm('');
+                    setSelectedCategory('');
+                    setSortAlphabetically(false);
+                }}>
+                    Limpiar filtro
                 </Button>
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
+            <div className="grid grid-cols-1 gap-20 md:grid-cols-2 lg:grid-cols-3 w-full">
                 {filteredGames.map((game, index) => (
                     <div key={game._id} className="mt-12 flex flex-col items-center">
                         <Image
