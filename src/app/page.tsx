@@ -21,7 +21,7 @@ export default async function Home() {
             JuegoMasVegettil
           </h1>
           <h2 className="text-4xl font-semibold mt-12 text-center">
-            Cuál va a ser el videojuego de 2023 que más están <br />
+            Cuál va a ser el videojuego de 2024 que más están <br />
             esperando los seguidores de vegetta777?
           </h2>
         </div>

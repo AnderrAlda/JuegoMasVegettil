@@ -5,13 +5,34 @@
 
 &nbsp;
 
-Welcome to our CrossFit e-commerce platform, your one-stop shop for all things fitness. Dive into our extensive collection of high-performance apparel and top-of-the-line equipment designed to optimize your CrossFit experience. With intuitive navigation and secure transactions, our buying process is seamless and stress-free.
+Con el objetivo de conocer cuál es el videojuego de 2024 que más están esperando los seguidores de Vegetta777, he desarrollado una página web donde los usuarios registrados pueden votar por el juego que creen será el mejor del año.
 
 ## Used technologies
 
-FitFlex has been build using the following technologies.
+Has sido construido con las siguientes tecnologias:
 
 -Typescript
--React
+
+
+-Nextjs
+
+
 -Tailwind
--Redux
+
+
+-Shadcn
+
+
+-MongoDB
+
+
+-Mongoose
+
+
+-NPM
+
+
+-Vercel
+
+
+-Cloudflare R2
