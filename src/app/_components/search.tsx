@@ -215,7 +215,7 @@ export default function SearchComp() {
                             <p className="mt-2">Categoría: {game.category}</p>
                             <p className="mt-2">Votos: {game.votes}</p>
                             <SignedIn>
-                                <Button onClick={() => handleVoteIncrement(game._id)}>
+                                <Button className="mt-4" onClick={() => handleVoteIncrement(game._id)}>
                                     +1
                                 </Button>      </SignedIn>
 
