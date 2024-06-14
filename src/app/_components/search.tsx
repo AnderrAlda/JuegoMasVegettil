@@ -4,6 +4,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { SignedIn } from "@clerk/nextjs";
 import {
     Select,
     SelectContent,
@@ -91,7 +92,7 @@ export default function SearchComp() {
 
             if (!voteResponse.ok) {
                 if (voteResponse.status === 429) {
-                    toast.error("El usuario ha alcanzado el número máximo de votos");
+                    toast.error("As alcanzado el número máximo de votos");
                 } else {
                     toast.error("Juego ya votado");
                 }
@@ -204,9 +205,12 @@ export default function SearchComp() {
                             </h2>
                             <p className="mt-2">Categoría: {game.category}</p>
                             <p className="mt-2">Votos: {game.votes}</p>
-                            <Button onClick={() => handleVoteIncrement(game._id)}>
-                                +1
-                            </Button>
+                            <SignedIn>
+                                <Button onClick={() => handleVoteIncrement(game._id)}>
+                                    +1
+                                </Button>      </SignedIn>
+
+
                         </div>
                     </div>
                 ))}
