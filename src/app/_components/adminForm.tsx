@@ -65,6 +65,8 @@ const AdminForm = ({ onGameCreated }: AdminFormProps) => {
     });
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [formKey, setFormKey] = useState(0); // Adding a key to force re-render
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -97,18 +99,19 @@ const AdminForm = ({ onGameCreated }: AdminFormProps) => {
             const response = await axios.post("/api/games", values); // Make a POST request to your API endpoint
             toast.success("Juego creado correctamente");
             console.log(response.data);
-            form.reset();
+            form.reset(); // Reset the form
             setSelectedFile(null);
             if (fileInputRef.current) {
                 fileInputRef.current.value = "";
             }
             onGameCreated(response.data); // Call the callback function with the new game data
+            setFormKey(formKey + 1); // Force re-render to reset form values
         } catch (error) {
             console.error(error);
             toast.error("Error creando el juego");
         }
     }
-    const [categories, setCategories] = useState<Category[]>();
+
     useEffect(() => {
         axios
             .get("/api/categories")
@@ -121,10 +124,9 @@ const AdminForm = ({ onGameCreated }: AdminFormProps) => {
     }, []);
 
     return (
-        <div>
+        <div key={formKey}> {/* Key added here */}
             <div className="mb-12">
                 <Link href={"/"}>
-
                     <div className="flex gap-2 items-center">
                         <ChevronLeft width={40} height={40} /><p>Volver</p>
                     </div>
