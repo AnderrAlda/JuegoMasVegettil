@@ -80,9 +80,9 @@ const DashboardContent = ({ initialGames }: DashboardContentProps) => {
                         <Image
                             src={getImageUrl(game.image)}
                             alt={game.title}
-                            width={200}
+                            width={400}
                             height={200}
-                            className="game-image rounded-xl"
+                            className="game-image rounded-xl w-[400px] h-[200px] object-cover"
                         />
                         <div>
                             <div className="game-details">

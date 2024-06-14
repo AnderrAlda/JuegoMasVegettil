@@ -204,9 +204,9 @@ export default function SearchComp() {
                         <Image
                             src={getImageUrl(game.image)}
                             alt={game.title}
-                            width={200}
+                            width={400}
                             height={200}
-                            className="game-image rounded-2xl"
+                            className="game-image rounded-xl w-[400px] h-[200px] object-cover"
                         />
                         <div className="text-center mt-4">
                             <h2 className="text-xl font-bold">

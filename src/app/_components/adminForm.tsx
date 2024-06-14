@@ -19,6 +19,8 @@ import axios from "axios";
 import { toast } from "sonner";
 import { getSignedUrlForS3Object } from "@/lib/s3";
 import { createUploadURL } from "@/lib/s3action";
+import Link from "next/link";
+import { ChevronLeft } from 'lucide-react';
 
 import {
     Select,
@@ -120,6 +122,15 @@ const AdminForm = ({ onGameCreated }: AdminFormProps) => {
 
     return (
         <div>
+            <div className="mb-12">
+                <Link href={"/"}>
+
+                    <div className="flex gap-2 items-center">
+                        <ChevronLeft width={40} height={40} /><p>Volver</p>
+                    </div>
+                </Link>
+            </div>
+
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <FormField
