@@ -13,7 +13,18 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'User ID and Game ID are required' }, { status: 400 });
         }
 
-        const vote = await usersGamesVotes.create({ userId, gameId });
+        // Check if the user has already voted for this game
+        const existingVote = await usersGamesVotes.findOne({ userId, gameId });
+        if (existingVote) {
+            return NextResponse.json({ error: 'User has already voted for this game' }, { status: 400 });
+        }
+
+        // If no existing vote, proceed to add the vote
+        const filter = { userId, gameId };
+        const update = { userId, gameId };
+        const options = { upsert: true, new: true };
+
+        const vote = await usersGamesVotes.findOneAndUpdate(filter, update, options);
 
         return NextResponse.json(vote);
     } catch (error) {

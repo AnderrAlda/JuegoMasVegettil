@@ -1,5 +1,5 @@
 "use client"
-
+import { toast } from "sonner";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -80,36 +80,46 @@ export default function SearchComp() {
         }
 
         try {
-            const response = await fetch('/api/addGameVote', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ id: gameId }),
-            });
-
-            if (response.ok) {
-                const updatedGame = await response.json();
-                // Update the received games with the updated game data
-                setReceivedGames((prevGames) =>
-                    prevGames.map((game) =>
-                        game._id === updatedGame._id ? updatedGame : game
-                    )
-                );
-            } else {
-                console.error('Failed to increment vote:', response.status);
-            }
-
             // Add vote to usersGamesVotes
-            await fetch('/api/usersGamesVotes', {
+            const voteResponse = await fetch('/api/usersGamesVotes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ userId: user.id, gameId }),
             });
+
+            if (!voteResponse.ok) {
+                toast.error("Juego ya votado");
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/addGameVote', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: gameId }),
+                });
+
+                if (response.ok) {
+                    const updatedGame = await response.json();
+                    // Update the received games with the updated game data
+                    setReceivedGames((prevGames) =>
+                        prevGames.map((game) =>
+                            game._id === updatedGame._id ? updatedGame : game
+                        )
+                    );
+                    toast.success("Juego votado correctamente");
+                } else {
+                    toast.error("Error votadon el juego");
+                }
+            } catch (error) {
+                toast.error("Error votando el juego");
+            }
         } catch (error) {
-            console.error('Error incrementing vote:', error);
+            toast.error("Error votando el juego");
         }
     };
     let filteredGames = receivedGames
