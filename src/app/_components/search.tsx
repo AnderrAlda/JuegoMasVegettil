@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { toast } from "sonner";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -13,6 +13,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useUser } from '@clerk/clerk-react';
+
 interface Game {
     _id: string;
     title: string;
@@ -44,6 +45,7 @@ export default function SearchComp() {
     const [selectedCategory, setSelectedCategory] = useState<string>("");
     const [sortAlphabetically, setSortAlphabetically] = useState<boolean>(false);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [selectKey, setSelectKey] = useState<number>(0);
 
     useEffect(() => {
         async function loadGames() {
@@ -127,6 +129,7 @@ export default function SearchComp() {
             toast.error("Error votando el juego");
         }
     };
+
     let filteredGames = receivedGames
         .filter((game) => {
             if (selectedCategory) {
@@ -148,8 +151,15 @@ export default function SearchComp() {
         setSortAlphabetically(!sortAlphabetically);
     };
 
+    const handleClearFilters = () => {
+        setSearchTerm('');
+        setSelectedCategory('');
+        setSortAlphabetically(false);
+        setSelectKey(prevKey => prevKey + 1); // Update the key to reset Select component
+    };
+
     return (
-        <main className="flex min-h-screen flex-col items-center   p-24">
+        <main className="flex min-h-screen flex-col items-center p-24">
             <div className="mb-8 flex gap-4">
                 <input
                     type="text"
@@ -159,7 +169,7 @@ export default function SearchComp() {
                     className="p-2 border border-gray-300 rounded-md"
                 />
 
-                <Select onValueChange={(value) => setSelectedCategory(value)}>
+                <Select key={selectKey} onValueChange={(value) => setSelectedCategory(value)}>
                     <SelectTrigger>
                         <SelectValue placeholder="Elige una categoría" />
                     </SelectTrigger>
@@ -186,15 +196,9 @@ export default function SearchComp() {
                             : "bg-white text-black"
                     }
                 >
-
-
                     {sortAlphabetically ? "Ordenar por Votos" : "Ordenar por orden alfabético"}
                 </Button>
-                <Button variant="outline" onClick={() => {
-                    setSearchTerm('');
-                    setSelectedCategory('');
-                    setSortAlphabetically(false);
-                }}>
+                <Button variant="outline" onClick={handleClearFilters}>
                     Limpiar filtro
                 </Button>
             </div>
@@ -217,9 +221,8 @@ export default function SearchComp() {
                             <SignedIn>
                                 <Button className="mt-4" onClick={() => handleVoteIncrement(game._id)}>
                                     +1
-                                </Button>      </SignedIn>
-
-
+                                </Button>
+                            </SignedIn>
                         </div>
                     </div>
                 ))}
