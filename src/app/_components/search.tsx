@@ -29,10 +29,11 @@ function getImageUrl(fileKey: string) {
 }
 
 export default function SearchComp() {
-    const [recivedGames, setRecivedGames] = useState<Game[]>([]);
+    const [receivedGames, setReceivedGames] = useState<Game[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
-    const [selectedCategory, setSelectedCategory] = useState<string>(""); // Add this state
-    const [sortAlphabetically, setSortAlphabetically] = useState<boolean>(false); // Add sorting state
+    const [selectedCategory, setSelectedCategory] = useState<string>("");
+    const [sortAlphabetically, setSortAlphabetically] = useState<boolean>(false);
+    const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
         async function loadGames() {
@@ -40,7 +41,7 @@ export default function SearchComp() {
                 const response = await fetch("/api/games");
                 if (response.ok) {
                     const gamesData = await response.json();
-                    setRecivedGames(gamesData);
+                    setReceivedGames(gamesData);
                 } else {
                     console.error("Failed to fetch games:", response.status);
                 }
@@ -52,7 +53,6 @@ export default function SearchComp() {
         loadGames();
     }, []);
 
-    const [categories, setCategories] = useState<Category[]>();
     useEffect(() => {
         axios
             .get("/api/categories")
@@ -64,7 +64,33 @@ export default function SearchComp() {
             });
     }, []);
 
-    let filteredGames = recivedGames
+    const handleVoteIncrement = async (gameId: string) => {
+        try {
+            const response = await fetch(`/api/addGameVote`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: gameId }),
+            });
+
+            if (response.ok) {
+                const updatedGame = await response.json();
+                // Update the received games with the updated game data
+                setReceivedGames((prevGames) =>
+                    prevGames.map((game) =>
+                        game._id === updatedGame._id ? updatedGame : game
+                    )
+                );
+            } else {
+                console.error("Failed to increment vote:", response.status);
+            }
+        } catch (error) {
+            console.error("Error incrementing vote:", error);
+        }
+    };
+
+    let filteredGames = receivedGames
         .filter((game) => {
             if (selectedCategory) {
                 return game.category === selectedCategory;
@@ -74,7 +100,9 @@ export default function SearchComp() {
         .filter((game) => game.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
     if (sortAlphabetically) {
-        filteredGames = filteredGames.sort((a, b) => a.title.localeCompare(b.title)); // Sort alphabetically by title
+        filteredGames = filteredGames.sort((a, b) =>
+            a.title.localeCompare(b.title)
+        ); // Sort alphabetically by title
     } else {
         filteredGames = filteredGames.sort((a, b) => b.votes - a.votes); // Sort by votes in descending order by default
     }
@@ -101,15 +129,27 @@ export default function SearchComp() {
 
                     <SelectContent>
                         {categories?.map((category) => (
-                            <SelectItem key={category.title} value={category.title}>
+                            <SelectItem
+                                key={category.title}
+                                value={category.title}
+                                className="text-black"
+                            >
                                 {category.title}
                             </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
 
-                <Button variant="outline" onClick={handleSortToggle} className={sortAlphabetically ? "bg-black text-white" : "bg-white text-black"}>
-                    {sortAlphabetically ? "Orden por Votos" : "Orden Alfabetico"}
+                <Button
+                    variant="outline"
+                    onClick={handleSortToggle}
+                    className={
+                        sortAlphabetically
+                            ? "bg-black text-white"
+                            : "bg-white text-black"
+                    }
+                >
+                    {sortAlphabetically ? "Orden por Votos" : "Orden Alfabético"}
                 </Button>
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
@@ -123,9 +163,14 @@ export default function SearchComp() {
                             className="game-image rounded-2xl"
                         />
                         <div className="text-center mt-4">
-                            <h2 className="text-xl font-bold">{index + 1}. {game.title}</h2>
+                            <h2 className="text-xl font-bold">
+                                {index + 1}. {game.title}
+                            </h2>
                             <p className="mt-2">Categoría: {game.category}</p>
                             <p className="mt-2">Votos: {game.votes}</p>
+                            <Button onClick={() => handleVoteIncrement(game._id)}>
+                                +1
+                            </Button>
                         </div>
                     </div>
                 ))}
