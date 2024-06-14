@@ -36,3 +36,6 @@ Ha sido construido con las siguientes tecnologias:
 
 
 -Cloudflare R2
+
+
+-Clerk
